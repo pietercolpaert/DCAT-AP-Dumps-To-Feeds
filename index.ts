@@ -2,12 +2,7 @@ import rdfDereferencer from "rdf-dereference";
 import {CBDShapeExtractor} from "extract-cbd-shape";
 const {canonize} = require('rdf-canonize');
 import { createHash } from 'node:crypto'
-
-const { Level } = require('level')
-const db = new Level('state', { valueEncoding: 'json' })
-
 import N3 from 'n3';
-import { argv } from 'node:process';
 
 // Helper function to make loading a quad stream in a store a promise
 let loadQuadStreamInStore = function (store: N3.Store, quadStream: any) {
@@ -36,13 +31,9 @@ let processActivity = function (quads: Array<any>, type: N3.NamedNode, iri:N3.Te
     });
 }
 
-let main = async function () {
-//Check for the flag --reset. If set, flush the db first
-    if (argv[2] === '--flush') {
-        await db.clear();
-    }
+export async function main (db:any, feedname:string, filename:string) {
     const store = new N3.Store();
-    const { data } = await rdfDereferencer.dereference('flanders2.ttl', { localFiles: true });
+    const { data } = await rdfDereferencer.dereference(filename, { localFiles: true });
     await loadQuadStreamInStore(store, data);
     //Todo: create a shape for the entities in the stream and let’s extract them accordingly
     let extractor = new CBDShapeExtractor();
@@ -52,8 +43,7 @@ let main = async function () {
         let entityquads = await extractor.extract(store, subject);
         // Alright! We got an entity!
         // Now let’s first create a hash to check whether the set of triples changed since last time.
-
-        //We’ll use a library to make the entity description canonized -- see https://w3c.github.io/rdf-canon/spec/
+        // We’ll use a library to make the entity description canonized -- see https://w3c.github.io/rdf-canon/spec/
         let canonizedString = await canonize(entityquads,{algorithm: 'RDFC-1.0'});
         //Now we can hash this string, for example with MD5
         let hashString = createHash('md5').update(canonizedString).digest('hex');
@@ -62,14 +52,14 @@ let main = async function () {
             let previousHashString = await db.get(subject.value);            
             if (previousHashString !== hashString) {
                 //An Update!
-                processActivity(entityquads, new N3.NamedNode("https://www.w3.org/ns/activitystreams#Update"),subject,hashString);
+                processActivity(entityquads, new N3.NamedNode("https://www.w3.org/ns/activitystreams#Update"), subject, hashString);
                 db.put(subject.value,hashString);
             } else {
                 //Remained the same: do nothing
                 //console.log("Remained the same", subject);
             }
         } catch (e) {
-            processActivity(entityquads, new N3.NamedNode("https://www.w3.org/ns/activitystreams#Create"),subject,hashString);
+            processActivity(entityquads, new N3.NamedNode("https://www.w3.org/ns/activitystreams#Create"), subject, hashString);
             //PreviousHashString hasn’t been set, so let’s add a create in our stream
             db.put(subject.value,hashString);
         }
@@ -79,7 +69,7 @@ let main = async function () {
     //loop over the keys and check whether they are set in the store. If there are keys that weren’t set before, it’s a deletion!
     for (let key of keys) {
         if (store.getQuads(new N3.NamedNode(key),null,null,null).length === 0) {
-            processActivity([],new N3.NamedNode("https://www.w3.org/ns/activitystreams#Remove"),new N3.NamedNode(key), "remove-" + (new Date()).getSeconds());
+            processActivity([], new N3.NamedNode("https://www.w3.org/ns/activitystreams#Remove"), new N3.NamedNode(key), "remove-" + (new Date()).getSeconds());
             //and remove the entry in leveldb now so it doesn’t appear as removed twice in the feed on the next run
             db.del(key);
         }
@@ -102,5 +92,3 @@ let getStandaloneEntitySubjects = function (store: N3.Store) {
     result = result.concat(store.getSubjects(null, new N3.NamedNode("http://purl.org/dc/terms/LicenseDocument"), null));
     return result;
 }
-
-main ();
