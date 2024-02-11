@@ -11,10 +11,10 @@ DUMPURL=https://admin.dataportal.se/all.rdf
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
 @prefix ldes: <https://w3id.org/ldes#>.
 
-</$FEEDNAME/feed> a ldes:EventStream ;
+<feed> a ldes:EventStream ;
     ldes:timestampPath as:published ;
     ldes:versionOfPath as:object ;
-    tree:view </$FEEDNAME/feed.ttl> .
+    tree:view <feed.ttl> .
 EOF
 
 # Next, we fetch the (new) dump
@@ -23,17 +23,17 @@ npx ldfetch $DUMPURL > $DUMPFILENAME
 ts-node bin/dumpsToFeed.ts $FEEDNAME $DUMPFILENAME > $FEEDNAME/$(date +'%Y-%m-%d').trig
 # If they file isn’t empty, add relations to the file from the feed.ttl. Remove the file if it’s empty as that means there are no updates for today. 
 [ -s $FEEDNAME/$(date +'%Y-%m-%d').trig ] && { cat >> $FEEDNAME/feed.ttl << EOF
-</$FEEDNAME/feed.ttl> tree:relation [
+<feed.ttl> tree:relation [
         a tree:GreaterThanOrEqualToRelation ;
         tree:path as:published ;
         tree:value "$(date +'%Y-%m-%d')T00:00:00Z"^^xsd:dateTime ;
-        tree:node <$FEEDNAME/$(date +'%Y-%m-%d').trig>
+        tree:node <$(date +'%Y-%m-%d').trig>
     ] ,
     [
         a tree:LessThanOrEqualToRelation ;
         tree:path as:published ;
         tree:value  "$(date +'%Y-%m-%d')T23:59:99Z"^^xsd:dateTime ;
-        tree:node <$FEEDNAME/$(date +'%Y-%m-%d').trig>
+        tree:node <$(date +'%Y-%m-%d').trig>
     ]
 EOF
 }|| rm $FEEDNAME/$(date +'%Y-%m-%d').trig
