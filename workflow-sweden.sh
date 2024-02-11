@@ -3,8 +3,7 @@ DUMPFILENAME=tmp123-sweden.ttl
 DUMPURL=https://admin.dataportal.se/all.rdf
 
 # Create the directory if it doesn’t exist yet, and consequentially, create the feed.ttl root file.
-[ -d $FEEDNAME ] || mkdir $FEEDNAME
-[ -s $FEEDNAME/feed.ttl ] && cat > $FEEDNAME/feed.ttl << EOF
+[ -d $FEEDNAME ] || mkdir $FEEDNAME; cat > $FEEDNAME/feed.ttl << EOF
 @prefix as: <https://www.w3.org/ns/activitystreams#>.
 @prefix dcat: <http://www.w3.org/ns/dcat#>.
 @prefix tree: <https://w3id.org/tree#>.
@@ -23,6 +22,7 @@ npx ldfetch $DUMPURL > $DUMPFILENAME
 ts-node bin/dumpsToFeed.ts $FEEDNAME $DUMPFILENAME > $FEEDNAME/$(date +'%Y-%m-%d').trig
 # If they file isn’t empty, add relations to the file from the feed.ttl. Remove the file if it’s empty as that means there are no updates for today. 
 [ -s $FEEDNAME/$(date +'%Y-%m-%d').trig ] && { cat >> $FEEDNAME/feed.ttl << EOF
+
 <feed.ttl> tree:relation [
         a tree:GreaterThanOrEqualToRelation ;
         tree:path as:published ;
@@ -34,7 +34,7 @@ ts-node bin/dumpsToFeed.ts $FEEDNAME $DUMPFILENAME > $FEEDNAME/$(date +'%Y-%m-%d
         tree:path as:published ;
         tree:value  "$(date +'%Y-%m-%d')T23:59:99Z"^^xsd:dateTime ;
         tree:node <$(date +'%Y-%m-%d').trig>
-    ]
+    ] .
 EOF
 }|| rm $FEEDNAME/$(date +'%Y-%m-%d').trig
 
