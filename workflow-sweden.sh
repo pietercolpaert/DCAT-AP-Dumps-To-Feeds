@@ -3,7 +3,7 @@ DUMPFILENAME=tmp123-sweden.ttl
 DUMPURL=https://admin.dataportal.se/all.rdf
 
 # Create the directory if it doesn’t exist yet, and consequentially, create the feed.ttl root file.
-[ -d $FEEDNAME ] || mkdir $FEEDNAME; cat > $FEEDNAME/feed.ttl << EOF
+[ -d $FEEDNAME ] || { mkdir $FEEDNAME; cat > $FEEDNAME/feed.ttl << EOF
 @prefix as: <https://www.w3.org/ns/activitystreams#>.
 @prefix dcat: <http://www.w3.org/ns/dcat#>.
 @prefix tree: <https://w3id.org/tree#>.
@@ -15,6 +15,7 @@ DUMPURL=https://admin.dataportal.se/all.rdf
     ldes:versionOfPath as:object ;
     tree:view <feed.ttl> .
 EOF
+}
 
 # Next, we fetch the (new) dump
 npx ldfetch $DUMPURL > $DUMPFILENAME
