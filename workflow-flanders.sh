@@ -20,7 +20,7 @@ EOF
 ts-node bin/helperFlanders.ts > $DUMPFILENAME
 tsc
 # assuming we will only fetch updates each day, we can name the files according to today’s date
-node --max-old-space-size=8192 dist/bin/dumpsToFeed.js $FEEDNAME $DUMPFILENAME > $FEEDNAME/$(date +'%Y-%m-%d').trig
+node --max-old-space-size=16192 dist/bin/dumpsToFeed.js $FEEDNAME $DUMPFILENAME > $FEEDNAME/$(date +'%Y-%m-%d').trig
 # If they file isn’t empty, add relations to the file from the feed.ttl. Remove the file if it’s empty as that means there are no updates for today. 
 [ -s $FEEDNAME/$(date +'%Y-%m-%d').trig ] && { cat >> $FEEDNAME/feed.ttl << EOF
 <feed.ttl> tree:relation [
@@ -39,4 +39,4 @@ EOF
 }|| rm $FEEDNAME/$(date +'%Y-%m-%d').trig
 
 # Remove the dump file as we won’t need it anymore and it’s nice to have a clean repo
-rm $DUMPFILENAME
+# rm $DUMPFILENAME
