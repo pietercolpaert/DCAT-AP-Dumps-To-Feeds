@@ -1,0 +1,4 @@
+@prefix ex: <http://example.org/> .
+
+ex:test a <http://www.w3.org/ns/dcat#Catalog> ;
+  ex:value 42. 
