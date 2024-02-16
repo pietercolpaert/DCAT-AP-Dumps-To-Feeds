@@ -18,7 +18,7 @@
     "@types/sinon": "^10.0.16",
     "chai": "^4.3.7",
     "commander": "^12.0.0",
-    "extract-cbd-shape": "^0.0.3",
+    "extract-cbd-shape": "^0.0.5",
     "level": "^8.0.1",
     "mocha": "^10.2.0",
     "n3": "^1.17.2",

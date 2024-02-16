@@ -39,7 +39,7 @@ describe("Test CBD with named graph", () => {
         console.log = (item) => createLog = createLog + item;
         await main(db, feedname, inputCreateFile)
         console.log = createOldLog
-        console.log(createLog)
+        //console.log(createLog)
         testCorrectness(createLog, "42", "https://www.w3.org/ns/activitystreams#Create")
 
         const inputUpdateFile = __dirname + "/inputUpdate.ttl"
