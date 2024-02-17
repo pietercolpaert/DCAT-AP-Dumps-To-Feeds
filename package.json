@@ -18,12 +18,13 @@
     "@types/sinon": "^10.0.16",
     "chai": "^4.3.7",
     "commander": "^12.0.0",
-    "extract-cbd-shape": "^0.0.5",
+    "extract-cbd-shape": "^0.1.0",
     "level": "^8.0.1",
     "mocha": "^10.2.0",
     "n3": "^1.17.2",
     "rdf-canonize": "^4.0.1",
     "rdf-dereference": "^2.2.0",
+    "rdf-stores": "^1.0.0",
     "ts-node": "^10.9.1"
   },
   "devDependencies": {

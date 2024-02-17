@@ -1,33 +1,42 @@
 import { assert } from "chai";
-import { NamedNode, Parser, Store, StreamParser, Term, Writer } from "n3";
-import { CBDShapeExtractor } from "extract-cbd-shape";
-import rdfDereference from "rdf-dereference";
+import { RdfStore } from "rdf-stores";
 import { Level } from "level";
 import { main } from "../index"
 import * as N3 from "n3";
+import { DataFactory } from "rdf-data-factory";
+const df: DataFactory = new DataFactory();
+
 
 function testCorrectness(log: string, value: string | undefined, type: string) {
     const parser = new N3.Parser();
-    const quads = parser.parse(log);
-    const store = new N3.Store(quads);
+    const quads = parser.parse(log); 
+    const store = RdfStore.createDefault();
+    for (let quad of quads) {
+        store.addQuad(quad);
+    }
 
-    const members = store.getObjects(null, new
-        N3.NamedNode("https://w3id.org/tree#member"), null);
-    assert(members.length == 1, "expected one member");
+    const members = store.getQuads(null, df.namedNode("https://w3id.org/tree#member"), null).map((quad) => {
+            return quad.object;
+        });
+    assert(members.length == 1, "expected one member in the case of a " + type);
     const member = members[0];
-    const types = store.getObjects(member,
-        "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", null);
+    const types = store.getQuads(member,df.namedNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"), null).map((quad) => {
+        return quad.object;
+    });
     assert(types.length == 1, "expected one type");
     assert(types[0].value == type, "expected correct type " + type);
 
     if (value) {
-        const foundValue = store.getObjects(null, "http://example.org/value", member);
+        //look up the value in the named graph
+        const foundValue = store.getQuads(null, df.namedNode("http://example.org/value"), null, member).map((quad) => {
+            return quad.object;
+        });
         assert(foundValue[0].value == value, "expected correct value " + value);
     }
 
 }
 
-describe("Test CBD with named graph", () => {
+describe("Simple test case with a create, a change and a removal", () => {
     it("Tests for DCAT-AP feeds", async () => {
         const feedname = '';
 
