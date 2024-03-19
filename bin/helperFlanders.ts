@@ -26,4 +26,5 @@ let main = async function (url: string) {
     })
 }
 
-main('https://dev.metadata.vlaanderen.be/srv/api/records?hitsPerPage=50&from=1&to=50&facet.q=isOpenData%2Fy');
+main('https://metadata.vlaanderen.be/api/collections/downloadtoepassing/items?f=dcat_ap_vl');
+     //https://dev.metadata.vlaanderen.be/srv/api/records?hitsPerPage=50&from=1&to=50&facet.q=isOpenData%2Fy');
