@@ -64,7 +64,7 @@ describe("Simple test case with a create, a change and a removal", () => {
         let deleteLog = "";
         console.log = (item) => deleteLog = deleteLog + item;
         await main(db, feedname, inputDeleteFile)
-        testCorrectness(deleteLog, undefined, "https://www.w3.org/ns/activitystreams#Remove")
+        testCorrectness(deleteLog, undefined, "https://www.w3.org/ns/activitystreams#Delete")
         console.log = deleteOldLog
 
     });
