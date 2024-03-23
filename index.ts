@@ -19,8 +19,8 @@ let loadQuadStreamInStore = function (store: RdfStore, quadStream: any) {
 let processActivity = function (quads: Array<any>, type: NamedNode, iri: NamedNode, hash:string) {
     // TODO: Instead of writing this to stdout as trig, we should use a JS Writer here of the connector architecture, so we can pipe it to an LDES server
     let writer = new N3.Writer({"format": "application/trig"});
-    //create new IRI for the activity: based on the hash of the content? -- This means we assume the subject is a named node
-    let subject = df.namedNode(iri.value + "#" + hash);
+    //create new relative IRI for the activity based on the hash of the activity
+    let subject = df.namedNode("#" + hash);
     // Let’s call our LDES a relative IRI `feed`, assuming another script will put it in the right place and use that LDES IRI. We might make this configurable though.
     writer.addQuads([
         df.quad(df.namedNode("feed"),df.namedNode("https://w3id.org/tree#member") , subject),
