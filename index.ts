@@ -84,7 +84,7 @@ export async function main (db:any, feedname:string, filename:string) {
     //loop over the keys and check whether they are set in the store. If there are keys that weren’t set before, it’s a deletion!
     for (let key of keys) {        
         if (store.getQuads(df.namedNode(key),null,null).length === 0) {
-            processActivity([], df.namedNode("https://www.w3.org/ns/activitystreams#Delete"), df.namedNode(key), "deletion-" + encodeURIComponent(new Date().toISOString()));
+            processActivity([], df.namedNode("https://www.w3.org/ns/activitystreams#Delete"), df.namedNode(key), "deletion-" + encodeURIComponent(key));
             //and remove the entry in leveldb now so it doesn’t appear as removed twice in the feed on the next run
             await db.del(key);
         }
