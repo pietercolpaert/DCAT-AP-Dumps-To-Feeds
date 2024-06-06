@@ -33,7 +33,7 @@ ts-node bin/dumpsToFeed.ts $FEEDNAME $DUMPFILENAME > $FEEDNAME/$(date +'%Y-%m-%d
     [
         a tree:LessThanOrEqualToRelation ;
         tree:path as:published ;
-        tree:value  "$(date +'%Y-%m-%d')T23:59:99Z"^^xsd:dateTime ;
+        tree:value  "$(date +'%Y-%m-%d')T23:59:59Z"^^xsd:dateTime ;
         tree:node <$(date +'%Y-%m-%d').trig>
     ] .
 EOF
